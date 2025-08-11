@@ -1,0 +1,127 @@
+<div class="container my-5">
+  <h2 class="fw-bold text-primary mb-4">Willkommen auf Ihrem Dashboard</h2>
+
+  <!--  Solde -->
+  <div class="card border-primary mb-4">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="card-title mb-0">Ihr Guthaben in THMCoins</h5>
+          <p class="fs-4 text-success fw-bold">{{ soldeTHMCoins }} THMCoins</p>
+        </div>
+        <button class="btn btn-outline-primary" (click)="acheterTHMCoins()">THMCoins kaufen</button>
+      </div>
+
+      <div *ngIf="showBuyForm" class="mt-4">
+        <p class="fw-bold">💸 Wählen Sie ein Paket:</p>
+        <div class="row g-2">
+          <div class="col-6 col-md-3" *ngFor="let option of buyOptions">
+            <button class="btn btn-outline-success w-100 text-center" (click)="acheterOption(option)">
+              <div class="fw-bold">{{ option.coins }} THMCoins</div>
+              <div><small>für {{ option.euros }} €</small></div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--  Veranstaltungen -->
+  <div class="card border-primary mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Bevorstehende Veranstaltungen</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let event of events">
+          {{ event.title }}
+          <button class="btn btn-success btn-sm" (click)="inscrire(event)">Anmelden</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!--  Wettanfrage erstellen -->
+  <div class="card border-primary mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Wettanfrage erstellen</h5>
+      <form class="row g-3" (ngSubmit)="creerDemandePari()" [formGroup]="betForm">
+        <div class="col-md-6">
+          <select class="form-select" formControlName="categorie">
+            <option value="" disabled selected>Sportart wählen</option>
+            <option value="Fußball">⚽ Fußball</option>
+            <option value="Basketball">🏀 Basketball</option>
+            <option value="Tennis">🎾 Tennis</option>
+            <option value="Handball">🯎 Handball</option>
+            <option value="eSport">🎮 eSport</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <input type="text" class="form-control" formControlName="match" placeholder="Spielname (RB Leipzig vs Frankfurt)">
+        </div>
+
+        <div class="col-md-6">
+          <input type="number" class="form-control" formControlName="montant" placeholder="Betrag (THMCoins)">
+        </div>
+
+        <div class="col-md-6">
+          <input type="text" class="form-control" formControlName="cote" placeholder="Vorgeschlagene Quote (z.B. 1:2)">
+        </div>
+
+        <div class="col-12 text-end">
+          <button type="submit" class="btn btn-primary">Erstellen</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!--  Wettanfragen Ihrer Community -->
+  <div class="card border-primary mb-4" *ngIf="demandesDePari.length > 0">
+    <div class="card-body">
+      <h5 class="card-title">Wettanfragen Ihrer Community</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let demande of demandesDePari">
+          <div>
+            <strong>{{ demande.username }}</strong> — {{ demande.match }}<br>
+            <small>
+              <span class="badge bg-secondary me-2">{{ demande.categorie }}</span>
+              {{ demande.montant }} Coins | Quote: {{ demande.cote }}
+            </small>
+          </div>
+          <div *ngIf="!istMeineWette(demande)">
+            <button class="btn btn-success btn-sm me-2" (click)="accepterPari(demande)"
+                    *ngIf="!istStatus(demande, 'akzeptiert')">Akzeptieren</button>
+            <button class="btn btn-outline-primary btn-sm" (click)="negocierPari(demande)"
+                    *ngIf="!istStatus(demande, 'verhandlung')">Verhandeln</button>
+            <span class="badge bg-success" *ngIf="istStatus(demande, 'akzeptiert')">Akzeptiert</span>
+            <span class="badge bg-warning text-dark" *ngIf="istStatus(demande, 'verhandlung')">Bitte um Verhandlung</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+ <!--  Meine Wetten & Community Link -->
+<div class="row mt-4">
+  <div class="col text-start">
+    <a routerLink="/meine-wetten"
+       class="btn text-white px-4"
+       style="background-color: #6c757d; border-color: #6c757d;">
+      <i class="bi bi-folder2-open me-1"></i> Meine Wetten
+    </a>
+  </div>
+  <div class="col text-end">
+    <a
+      [routerLink]="isLCB ? '/lcb-dashboard' : null"
+      [class.disabled]="!isLCB"
+      [attr.aria-disabled]="!isLCB"
+      class="btn text-white px-4 d-inline-flex align-items-center gap-2"
+      style="background-color: #0dcaf0; border-color: #0dcaf0; pointer-events: {{ isLCB ? 'auto' : 'none' }}"
+      [attr.title]="!isLCB ? 'Nur für LCBs verfügbar' : null">
+      <i class="bi bi-person-gear fs-5"></i>
+      <span>Community betreten</span>
+    </a>
+  </div>
+</div>
+
+
+</div>
